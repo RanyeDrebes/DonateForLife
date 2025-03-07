@@ -1,0 +1,384 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:DonateForLife.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
+             x:Class="DonateForLife.Views.MatchingView"
+             x:DataType="vm:MatchingViewModel">
+
+	<Grid RowDefinitions="Auto,*,Auto">
+		<!-- Header -->
+		<Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,20">
+			<TextBlock Grid.Column="0" Text="Organ Matching System" FontSize="24" FontWeight="SemiBold" Foreground="#FF1976D2"/>
+			<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+				<Button Content="Run Matching Algorithm" Command="{Binding RunMatchingCommand}" Classes="BlueButton"/>
+				<Button Content="Refresh Data" Command="{Binding RefreshCommand}" Classes="ActionButton"/>
+			</StackPanel>
+		</Grid>
+
+		<!-- Main Content -->
+		<Grid Grid.Row="1" ColumnDefinitions="320,*">
+
+			<!-- Left Panel - Available Organs & Algorithm Settings -->
+			<Grid Grid.Column="0" RowDefinitions="Auto,*,Auto" Margin="0,0,15,0">
+
+				<!-- Organ Selection -->
+				<Border Grid.Row="0" Classes="ContentCard" Margin="0,0,0,15">
+					<Grid RowDefinitions="Auto,*">
+						<TextBlock Grid.Row="0" Text="Available Organs" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10"/>
+
+						<ListBox Grid.Row="1"
+                                 Items="{Binding AvailableOrgans}"
+                                 SelectedItem="{Binding SelectedOrgan}"
+                                 Background="Transparent"
+                                 MaxHeight="200">
+							<ListBox.ItemTemplate>
+								<DataTemplate>
+									<Border Background="#FFEFEFF4" CornerRadius="6" Padding="10" Margin="0,3">
+										<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
+											<Border Grid.RowSpan="3" Grid.Column="0"
+                                                    Width="40" Height="40"
+                                                    CornerRadius="20"
+                                                    Background="#FFE3F2FD"
+                                                    Margin="0,0,10,0"
+                                                    VerticalAlignment="Center">
+												<TextBlock Text="{Binding Type}"
+                                                           HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center"
+                                                           FontWeight="Bold"
+                                                           Foreground="#FF1976D2"/>
+											</Border>
+
+											<TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Type}" FontWeight="SemiBold"/>
+											<StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Spacing="5">
+												<TextBlock Text="Blood:" Foreground="#FF757575"/>
+												<TextBlock Text="{Binding BloodType}" FontWeight="SemiBold"/>
+											</StackPanel>
+											<StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="5">
+												<TextBlock Text="Viable for:" Foreground="#FF757575"/>
+												<TextBlock Text="{Binding RemainingViability}" FontWeight="SemiBold"/>
+											</StackPanel>
+										</Grid>
+									</Border>
+								</DataTemplate>
+							</ListBox.ItemTemplate>
+						</ListBox>
+					</Grid>
+				</Border>
+
+				<!-- Algorithm Configuration -->
+				<Border Grid.Row="1" Classes="ContentCard" Margin="0,0,0,15">
+					<Grid RowDefinitions="Auto,*">
+						<TextBlock Grid.Row="0" Text="Algorithm Settings" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15"/>
+
+						<StackPanel Grid.Row="1" Spacing="15">
+							<TextBlock Text="Matching Weights" FontWeight="SemiBold"/>
+
+							<!-- Blood Type Weight -->
+							<Grid ColumnDefinitions="120,*,40" RowDefinitions="Auto,Auto">
+								<TextBlock Grid.Row="0" Grid.Column="0" Text="Blood Type" VerticalAlignment="Center"/>
+								<Slider Grid.Row="0" Grid.Column="1"
+                                        Minimum="0" Maximum="100"
+                                        Value="{Binding BloodTypeWeight}"
+                                        TickFrequency="10"
+                                        TickPlacement="BottomRight"/>
+								<TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding BloodTypeWeight}" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+							</Grid>
+
+							<!-- HLA Compatibility Weight -->
+							<Grid ColumnDefinitions="120,*,40" RowDefinitions="Auto,Auto">
+								<TextBlock Grid.Row="0" Grid.Column="0" Text="HLA Compatibility" VerticalAlignment="Center"/>
+								<Slider Grid.Row="0" Grid.Column="1"
+                                        Minimum="0" Maximum="100"
+                                        Value="{Binding HlaWeight}"
+                                        TickFrequency="10"
+                                        TickPlacement="BottomRight"/>
+								<TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding HlaWeight}" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+							</Grid>
+
+							<!-- Age Difference Weight -->
+							<Grid ColumnDefinitions="120,*,40" RowDefinitions="Auto,Auto">
+								<TextBlock Grid.Row="0" Grid.Column="0" Text="Age Difference" VerticalAlignment="Center"/>
+								<Slider Grid.Row="0" Grid.Column="1"
+                                        Minimum="0" Maximum="100"
+                                        Value="{Binding AgeWeight}"
+                                        TickFrequency="10"
+                                        TickPlacement="BottomRight"/>
+								<TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding AgeWeight}" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+							</Grid>
+
+							<!-- Waiting Time Weight -->
+							<Grid ColumnDefinitions="120,*,40" RowDefinitions="Auto,Auto">
+								<TextBlock Grid.Row="0" Grid.Column="0" Text="Waiting Time" VerticalAlignment="Center"/>
+								<Slider Grid.Row="0" Grid.Column="1"
+                                        Minimum="0" Maximum="100"
+                                        Value="{Binding WaitingTimeWeight}"
+                                        TickFrequency="10"
+                                        TickPlacement="BottomRight"/>
+								<TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding WaitingTimeWeight}" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+							</Grid>
+
+							<!-- Urgency Weight -->
+							<Grid ColumnDefinitions="120,*,40" RowDefinitions="Auto,Auto">
+								<TextBlock Grid.Row="0" Grid.Column="0" Text="Urgency" VerticalAlignment="Center"/>
+								<Slider Grid.Row="0" Grid.Column="1"
+                                        Minimum="0" Maximum="100"
+                                        Value="{Binding UrgencyWeight}"
+                                        TickFrequency="10"
+                                        TickPlacement="BottomRight"/>
+								<TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding UrgencyWeight}" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+							</Grid>
+
+							<Button Content="Save Algorithm Configuration"
+                                    Command="{Binding SaveAlgorithmConfigCommand}"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,15,0,0"
+                                    Classes="ActionButton"/>
+						</StackPanel>
+					</Grid>
+				</Border>
+
+				<!-- Algorithm Version Selection -->
+				<Border Grid.Row="2" Classes="ContentCard">
+					<Grid RowDefinitions="Auto,Auto">
+						<TextBlock Grid.Row="0" Text="Algorithm Version" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10"/>
+
+						<ComboBox Grid.Row="1"
+                                  Items="{Binding AlgorithmVersions}"
+                                  SelectedItem="{Binding SelectedAlgorithmVersion}"
+                                  HorizontalAlignment="Stretch">
+							<ComboBox.ItemTemplate>
+								<DataTemplate>
+									<TextBlock Text="{Binding}"/>
+								</DataTemplate>
+							</ComboBox.ItemTemplate>
+						</ComboBox>
+					</Grid>
+				</Border>
+			</Grid>
+
+			<!-- Right Panel - Match Results -->
+			<Border Grid.Column="1" Classes="ContentCard" Padding="0">
+				<Grid RowDefinitions="Auto,*">
+					<Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="20,15">
+						<TextBlock Grid.Column="0" Text="Matching Results" FontSize="18" FontWeight="SemiBold"/>
+						<TextBlock Grid.Column="1" Text="{Binding MatchingStatus}" Foreground="#FF1976D2" FontStyle="Italic"/>
+					</Grid>
+
+					<Border Grid.Row="1" BorderBrush="#FFE0E0E0" BorderThickness="0,1,0,0">
+						<Grid>
+							<!-- No Organ Selected Message -->
+							<TextBlock Text="Please select an organ to view potential matches"
+                                       IsVisible="{Binding !HasSelectedOrgan}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Foreground="#FF9E9E9E"
+                                       FontSize="16"/>
+
+							<!-- Match Results List -->
+							<ScrollViewer IsVisible="{Binding HasSelectedOrgan}">
+								<ItemsControl Items="{Binding PotentialMatches}">
+									<ItemsControl.ItemTemplate>
+										<DataTemplate>
+											<Border Margin="15" Classes="MatchCard">
+												<Grid RowDefinitions="Auto,*">
+													<!-- Match Header -->
+													<Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+														<StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10">
+															<Border Width="40" Height="40"
+                                                                    CornerRadius="20"
+                                                                    Background="#FFE3F2FD">
+																<TextBlock Text="{Binding Recipient.BloodType}"
+                                                                           HorizontalAlignment="Center"
+                                                                           VerticalAlignment="Center"
+                                                                           FontWeight="Bold"
+                                                                           Foreground="#FF1976D2"/>
+															</Border>
+															<StackPanel>
+																<TextBlock Text="{Binding Recipient.FullName}" FontSize="16" FontWeight="SemiBold"/>
+																<TextBlock Text="{Binding Recipient.Hospital}" Foreground="#FF757575" FontSize="13"/>
+															</StackPanel>
+														</StackPanel>
+
+														<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="5">
+															<Border CornerRadius="5" Background="#FFBBDEFB" Padding="8,3">
+																<StackPanel Orientation="Horizontal" Spacing="5">
+																	<TextBlock Text="Match:" Foreground="#FF1565C0"/>
+																	<TextBlock Text="{Binding CompatibilityScore, StringFormat='{}{0:N1}%'}"
+                                                                               FontWeight="SemiBold"
+                                                                               Foreground="#FF1565C0"/>
+																</StackPanel>
+															</Border>
+
+															<Border CornerRadius="5" Background="#FFE8F5E9" Padding="8,3">
+																<StackPanel Orientation="Horizontal" Spacing="5">
+																	<TextBlock Text="Rank:" Foreground="#FF2E7D32"/>
+																	<TextBlock Text="{Binding RankingScore, StringFormat='{}{0:N1}%'}"
+                                                                               FontWeight="SemiBold"
+                                                                               Foreground="#FF2E7D32"/>
+																</StackPanel>
+															</Border>
+														</StackPanel>
+													</Grid>
+
+													<!-- Match Details -->
+													<Grid Grid.Row="1" Margin="0,15,0,0" RowDefinitions="Auto,Auto">
+														<!-- Match Factors -->
+														<ItemsControl Grid.Row="0" Items="{Binding MatchingFactors}">
+															<ItemsControl.ItemsPanel>
+																<ItemsPanelTemplate>
+																	<UniformGrid Columns="5" Rows="1"/>
+																</ItemsPanelTemplate>
+															</ItemsControl.ItemsPanel>
+															<ItemsControl.ItemTemplate>
+																<DataTemplate>
+																	<Grid RowDefinitions="Auto,Auto,Auto" Margin="5">
+																		<TextBlock Grid.Row="0" Text="{Binding FactorName}" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+
+																		<Border Grid.Row="1"
+                                                                                Height="6"
+                                                                                CornerRadius="3"
+                                                                                Background="#FFF5F5F5"
+                                                                                Margin="0,8">
+																			<Border HorizontalAlignment="Left"
+                                                                                    Width="{Binding Score, Converter={StaticResource PercentageToWidthConverter}}"
+                                                                                    Height="6"
+                                                                                    CornerRadius="3"
+                                                                                    Background="#FF2196F3"/>
+																		</Border>
+
+																		<TextBlock Grid.Row="2"
+                                                                                   Text="{Binding Score, StringFormat='{}{0:N0}%'}"
+                                                                                   FontSize="12"
+                                                                                   HorizontalAlignment="Center"/>
+																	</Grid>
+																</DataTemplate>
+															</ItemsControl.ItemTemplate>
+														</ItemsControl>
+
+														<!-- Action Buttons -->
+														<StackPanel Grid.Row="1"
+                                                                    Orientation="Horizontal"
+                                                                    HorizontalAlignment="Right"
+                                                                    Margin="0,15,0,0"
+                                                                    Spacing="10">
+															<Button Content="View Details"
+                                                                    Command="{Binding $parent[ItemsControl].DataContext.ViewMatchDetailsCommand}"
+                                                                    CommandParameter="{Binding}"
+                                                                    Classes="ActionButton"/>
+
+															<Button Content="Approve Match"
+                                                                    Command="{Binding $parent[ItemsControl].DataContext.ApproveMatchCommand}"
+                                                                    CommandParameter="{Binding}"
+                                                                    Classes="BlueButton"/>
+														</StackPanel>
+													</Grid>
+												</Grid>
+											</Border>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</ScrollViewer>
+						</Grid>
+					</Border>
+				</Grid>
+			</Border>
+		</Grid>
+
+		<!-- Footer Help Text -->
+		<Border Grid.Row="2" Background="#FFF5F5F5" CornerRadius="5" Padding="15" Margin="0,20,0,0">
+			<StackPanel>
+				<TextBlock Text="Matching Process Information" FontWeight="SemiBold"/>
+				<TextBlock Text="The matching algorithm evaluates compatibility based on multiple factors including blood type, HLA compatibility, age difference, waiting time, and medical urgency. Configure the weights to customize the importance of each factor in the final matching score."
+                           TextWrapping="Wrap"
+                           Foreground="#FF757575"
+                           Margin="0,5,0,0"/>
+			</StackPanel>
+		</Border>
+	</Grid>
+
+	<!-- Styles for this view -->
+	<UserControl.Styles>
+		<Style Selector="Border.ContentCard">
+			<Setter Property="Background" Value="#FFFFFFFF"/>
+			<Setter Property="CornerRadius" Value="10"/>
+			<Setter Property="Padding" Value="15"/>
+			<Setter Property="BoxShadow" Value="0 2 10 0 #15000000"/>
+		</Style>
+
+		<Style Selector="Border.MatchCard">
+			<Setter Property="Background" Value="#FFFFFFFF"/>
+			<Setter Property="CornerRadius" Value="8"/>
+			<Setter Property="Padding" Value="15"/>
+			<Setter Property="BoxShadow" Value="0 1 5 0 #10000000"/>
+		</Style>
+
+		<!-- Button styles from dashboard -->
+		<Style Selector="Button.BlueButton">
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="Button">
+						<Border Name="PART_ButtonBorder"
+                                Background="#FF2196F3"
+                                BorderThickness="0"
+                                CornerRadius="4"
+                                Padding="15,8">
+							<ContentPresenter Name="PART_ContentPresenter"
+                                              Content="{TemplateBinding Content}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              HorizontalContentAlignment="Center"
+                                              VerticalContentAlignment="Center"
+                                              Foreground="#FFFFFFFF" />
+						</Border>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+		<!-- Hover state -->
+		<Style Selector="Button.BlueButton /template/ Border#PART_ButtonBorder:pointerover">
+			<Setter Property="Background" Value="#FF1E88E5"/>
+		</Style>
+
+		<!-- Pressed state -->
+		<Style Selector="Button.BlueButton:pressed /template/ Border#PART_ButtonBorder">
+			<Setter Property="Background" Value="#FF1565C0"/>
+		</Style>
+
+		<!-- Action Button Styles (same as in MainWindow) -->
+		<Style Selector="Button.ActionButton">
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="Button">
+						<Border Name="PART_ButtonBorder"
+                                Background="#FFFFFFFF"
+                                BorderBrush="#FFDDDDDD"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="12,8">
+							<ContentPresenter Name="PART_ContentPresenter"
+                                              Content="{TemplateBinding Content}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              HorizontalContentAlignment="Center"
+                                              VerticalContentAlignment="Center"
+                                              Foreground="#FF616161" />
+						</Border>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+		<!-- Hover state for action buttons -->
+		<Style Selector="Button.ActionButton /template/ Border#PART_ButtonBorder:pointerover">
+			<Setter Property="Background" Value="#FFF5F5F5"/>
+			<Setter Property="BorderBrush" Value="#FFCCCCCC"/>
+		</Style>
+
+		<!-- Pressed state for action buttons -->
+		<Style Selector="Button.ActionButton:pressed /template/ Border#PART_ButtonBorder">
+			<Setter Property="Background" Value="#FFE0E0E0"/>
+			<Setter Property="BorderBrush" Value="#FFBBBBBB"/>
+		</Style>
+	</UserControl.Styles>
+</UserControl>
