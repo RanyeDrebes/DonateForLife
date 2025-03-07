@@ -1,0 +1,162 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:DonateForLife.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="DonateForLife.Views.DashboardView"
+             x:DataType="vm:DashboardViewModel">
+
+	<Grid RowDefinitions="Auto,*,Auto">
+		<!-- Header -->
+		<Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,20">
+			<TextBlock Grid.Column="0" Text="Dashboard Overview" FontSize="24" FontWeight="SemiBold" Foreground="#FF1976D2"/>
+			<Button Grid.Column="1" Content="Refresh" Command="{Binding RefreshCommand}" VerticalAlignment="Center" Classes="BlueButton"/>
+		</Grid>
+
+		<!-- Main Content -->
+		<Grid Grid.Row="1" RowDefinitions="Auto,*">
+			<!-- Statistics Cards -->
+			<Grid Grid.Row="0" ColumnDefinitions="*,*,*,*,*" Margin="0,0,0,20">
+				<!-- Total Donors -->
+				<Border Grid.Column="0" Classes="StatCard">
+					<Grid RowDefinitions="Auto,Auto,Auto">
+						<TextBlock Grid.Row="0" Text="Total Donors" Classes="StatTitle"/>
+						<TextBlock Grid.Row="1" Text="{Binding TotalDonors}" Classes="StatValue"/>
+						<TextBlock Grid.Row="2" Text="Registered organ donors" Classes="StatSubtitle"/>
+					</Grid>
+				</Border>
+
+				<!-- Total Recipients -->
+				<Border Grid.Column="1" Classes="StatCard">
+					<Grid RowDefinitions="Auto,Auto,Auto">
+						<TextBlock Grid.Row="0" Text="Total Recipients" Classes="StatTitle"/>
+						<TextBlock Grid.Row="1" Text="{Binding TotalRecipients}" Classes="StatValue"/>
+						<TextBlock Grid.Row="2" Text="Waiting for organs" Classes="StatSubtitle"/>
+					</Grid>
+				</Border>
+
+				<!-- Available Organs -->
+				<Border Grid.Column="2" Classes="StatCard">
+					<Grid RowDefinitions="Auto,Auto,Auto">
+						<TextBlock Grid.Row="0" Text="Available Organs" Classes="StatTitle"/>
+						<TextBlock Grid.Row="1" Text="{Binding AvailableOrgans}" Classes="StatValue"/>
+						<TextBlock Grid.Row="2" Text="Ready for transplant" Classes="StatSubtitle"/>
+					</Grid>
+				</Border>
+
+				<!-- Completed Transplants -->
+				<Border Grid.Column="3" Classes="StatCard">
+					<Grid RowDefinitions="Auto,Auto,Auto">
+						<TextBlock Grid.Row="0" Text="Completed Transplants" Classes="StatTitle"/>
+						<TextBlock Grid.Row="1" Text="{Binding CompleteTransplantations}" Classes="StatValue"/>
+						<TextBlock Grid.Row="2" Text="Successful procedures" Classes="StatSubtitle"/>
+					</Grid>
+				</Border>
+
+				<!-- Pending Matches -->
+				<Border Grid.Column="4" Classes="StatCard">
+					<Grid RowDefinitions="Auto,Auto,Auto">
+						<TextBlock Grid.Row="0" Text="Pending Matches" Classes="StatTitle"/>
+						<TextBlock Grid.Row="1" Text="{Binding PendingMatches}" Classes="StatValue"/>
+						<TextBlock Grid.Row="2" Text="Awaiting approval" Classes="StatSubtitle"/>
+					</Grid>
+				</Border>
+			</Grid>
+
+			<!-- Recent Activity (Simplified) -->
+			<Border Grid.Row="1" Background="#FFFFFFFF" Padding="20" CornerRadius="10" BoxShadow="0 2 10 0 #15000000">
+				<Grid RowDefinitions="Auto,*">
+					<TextBlock Grid.Row="0" Text="Recent Activity" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15"/>
+
+					<ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+						<StackPanel Spacing="10">
+							<TextBlock Text="New donor registered: Thomas Müller" />
+							<TextBlock Text="New organ available: Kidney (O+)" />
+							<TextBlock Text="Match found for Kidney (O+) to Anna Schmidt" />
+							<TextBlock Text="Match approved by Dr. Klaus Weber" />
+							<TextBlock Text="Transplantation scheduled for tomorrow" />
+						</StackPanel>
+					</ScrollViewer>
+				</Grid>
+			</Border>
+		</Grid>
+
+		<!-- Footer -->
+		<StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+			<Button Content="Add New Donor" Margin="5,0" Classes="BlueButton"/>
+			<Button Content="Add New Recipient" Margin="5,0" Classes="BlueButton"/>
+			<Button Content="Register Organ" Margin="5,0" Classes="BlueButton"/>
+			<Button Content="Run Matching Algorithm" Margin="5,0" Classes="BlueButton"/>
+		</StackPanel>
+	</Grid>
+
+	<!-- Styles -->
+	<UserControl.Styles>
+		<Style Selector="Border.StatCard">
+			<Setter Property="Background" Value="#FFFFFFFF"/>
+			<Setter Property="CornerRadius" Value="10"/>
+			<Setter Property="Padding" Value="15"/>
+			<Setter Property="Margin" Value="5"/>
+			<Setter Property="BoxShadow" Value="0 2 10 0 #15000000"/>
+		</Style>
+
+		<Style Selector="TextBlock.StatTitle">
+			<Setter Property="FontSize" Value="14"/>
+			<Setter Property="Foreground" Value="#FF757575"/>
+			<Setter Property="Margin" Value="0,0,0,5"/>
+		</Style>
+
+		<Style Selector="TextBlock.StatValue">
+			<Setter Property="FontSize" Value="28"/>
+			<Setter Property="FontWeight" Value="SemiBold"/>
+			<Setter Property="Foreground" Value="#FF212121"/>
+			<Setter Property="Margin" Value="0,0,0,5"/>
+		</Style>
+
+		<Style Selector="TextBlock.StatSubtitle">
+			<Setter Property="FontSize" Value="12"/>
+			<Setter Property="Foreground" Value="#FF9E9E9E"/>
+		</Style>
+
+		<!-- Button Template with Hover Effects -->
+		<Style Selector="Button.BlueButton">
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="Button">
+						<Border Name="PART_ButtonBorder"
+                                Background="#FF2196F3"
+                                BorderThickness="0"
+                                CornerRadius="4"
+                                Padding="15,8">
+							<ContentPresenter Name="PART_ContentPresenter"
+                                              Content="{TemplateBinding Content}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              HorizontalContentAlignment="Center"
+                                              VerticalContentAlignment="Center"
+                                              Foreground="#FFFFFFFF" />
+						</Border>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+		<!-- Hover state -->
+		<Style Selector="Button.BlueButton /template/ Border#PART_ButtonBorder:pointerover">
+			<Setter Property="Background" Value="#FFE0E0E0"/>
+		</Style>
+
+		<Style Selector="Button.BlueButton /template/ ContentPresenter#PART_ContentPresenter:pointerover">
+			<Setter Property="Foreground" Value="#FF1976D2"/>
+		</Style>
+
+		<!-- Pressed state -->
+		<Style Selector="Button.BlueButton:pressed /template/ Border#PART_ButtonBorder">
+			<Setter Property="Background" Value="#FFD0D0D0"/>
+		</Style>
+
+		<Style Selector="Button.BlueButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Foreground" Value="#FF1565C0"/>
+		</Style>
+	</UserControl.Styles>
+</UserControl>

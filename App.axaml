@@ -3,13 +3,44 @@
              x:Class="DonateForLife.App"
              xmlns:local="using:DonateForLife"
              RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+	<!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
-    <Application.DataTemplates>
-        <local:ViewLocator/>
-    </Application.DataTemplates>
-  
-    <Application.Styles>
-        <FluentTheme />
-    </Application.Styles>
+	<Application.DataTemplates>
+		<local:ViewLocator/>
+	</Application.DataTemplates>
+
+	<Application.Styles>
+		<FluentTheme />
+
+		<!-- Custom TextBox Styles -->
+		<Style Selector="TextBox">
+			<Setter Property="Background" Value="#FFFFFFFF"/>
+			<Setter Property="Foreground" Value="#FF000000"/>
+			<Setter Property="CaretBrush" Value="#FF1976D2"/>
+			<Setter Property="SelectionBrush" Value="#801976D2"/>
+			<Setter Property="BorderBrush" Value="#FFDDDDDD"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="CornerRadius" Value="4"/>
+			<Setter Property="Padding" Value="10"/>
+			<Setter Property="FontSize" Value="14"/>
+		</Style>
+
+		<!-- Pointerover state -->
+		<Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+			<Setter Property="BorderBrush" Value="#FF2196F3"/>
+			<Setter Property="Background" Value="#FFFFFFFF"/>
+		</Style>
+
+		<!-- Focus state -->
+		<Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+			<Setter Property="BorderBrush" Value="#FF1976D2"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="Background" Value="#FFFFFFFF"/>
+		</Style>
+
+		<!-- Watermark style (placeholder text) -->
+		<Style Selector="TextBox /template/ TextBlock#PART_Watermark">
+			<Setter Property="Foreground" Value="#FF9E9E9E"/>
+		</Style>
+	</Application.Styles>
 </Application>
