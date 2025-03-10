@@ -13,11 +13,6 @@
         public string Message => "Recipients Module - Coming Soon";
     }
 
-    public class MatchingViewModel : ViewModelBase
-    {
-        public string Message => "Matching Module - Coming Soon";
-    }
-
     public class TransplantationsViewModel : ViewModelBase
     {
         public string Message => "Transplantations Module - Coming Soon";
