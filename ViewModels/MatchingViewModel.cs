@@ -33,14 +33,14 @@ namespace DonateForLife.ViewModels
             _dataService = DataService.Instance;
 
             // Initialize collections
-            AvailableOrgans = new ObservableCollection<Organ>(_dataService.GetAllOrgans().Where(o => o.Status == OrganStatus.Available));
-            PotentialMatches = new ObservableCollection<Match>();
-            AlgorithmVersions = new ObservableCollection<string>
-            {
+            AvailableOrgans = [.. _dataService.GetAllOrgans().Where(o => o.Status == OrganStatus.Available)];
+            PotentialMatches = [];
+            AlgorithmVersions =
+            [
                 "Standard v1.0",
                 "Enhanced v1.2",
                 "Research v2.0 (Beta)"
-            };
+            ];
             SelectedAlgorithmVersion = AlgorithmVersions[0];
 
             // Initial status
