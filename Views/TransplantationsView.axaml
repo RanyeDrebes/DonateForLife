@@ -1,0 +1,425 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:DonateForLife.ViewModels"
+        xmlns:models="using:DonateForLife.Models"
+        xmlns:converters="using:DonateForLife.Converters"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
+        x:Class="DonateForLife.Views.TransplantationsView"
+        x:CompileBindings="False"
+        Background="White">
+
+	<Grid RowDefinitions="Auto,*,Auto">
+		<!-- Header -->
+		<Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,20">
+			<TextBlock Grid.Column="0" Text="Transplantation Management" FontSize="24" FontWeight="SemiBold" Foreground="Black"/>
+			<StackPanel Grid.Column="1" Orientation="Horizontal">
+				<Button Content="Schedule Transplantation" Command="{Binding ScheduleTransplantationCommand}" Classes="BlueButton" Margin="0,0,10,0"/>
+				<Button Content="Refresh Data" Command="{Binding RefreshCommand}" Classes="ActionButton"/>
+			</StackPanel>
+		</Grid>
+
+		<!-- Main Content -->
+		<Grid Grid.Row="1" ColumnDefinitions="320,*">
+
+			<!-- Left Panel - Filters & Stats -->
+			<Grid Grid.Column="0" RowDefinitions="Auto,*" Margin="0,0,15,0">
+
+				<!-- Stats -->
+				<Border Grid.Row="0" Classes="ContentCard" Margin="0,0,0,15">
+					<Grid RowDefinitions="Auto,*">
+						<TextBlock Grid.Row="0" Text="Transplantation Statistics" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="#1565C0"/>
+
+						<StackPanel Grid.Row="1">
+							<Grid ColumnDefinitions="*,Auto" Margin="0,0,0,15">
+								<TextBlock Text="Total Transplantations" Foreground="#616161"/>
+								<TextBlock Text="{Binding TotalTransplantations}" FontWeight="SemiBold" Foreground="#212121" Grid.Column="1"/>
+							</Grid>
+
+							<Grid ColumnDefinitions="*,Auto" Margin="0,0,0,15">
+								<TextBlock Text="Scheduled" Foreground="#616161"/>
+								<TextBlock Text="{Binding ScheduledTransplantations}" FontWeight="SemiBold" Foreground="#212121" Grid.Column="1"/>
+							</Grid>
+
+							<Grid ColumnDefinitions="*,Auto" Margin="0,0,0,15">
+								<TextBlock Text="Completed" Foreground="#616161"/>
+								<TextBlock Text="{Binding CompletedTransplantations}" FontWeight="SemiBold" Foreground="#212121" Grid.Column="1"/>
+							</Grid>
+
+							<Grid ColumnDefinitions="*,Auto" Margin="0,0,0,15">
+								<TextBlock Text="Successful" Foreground="#616161"/>
+								<TextBlock Text="{Binding SuccessfulTransplantations}" FontWeight="SemiBold" Foreground="#212121" Grid.Column="1"/>
+							</Grid>
+
+							<Grid ColumnDefinitions="*,Auto">
+								<TextBlock Text="Cancelled" Foreground="#616161"/>
+								<TextBlock Text="{Binding CancelledTransplantations}" FontWeight="SemiBold" Foreground="#212121" Grid.Column="1"/>
+							</Grid>
+						</StackPanel>
+					</Grid>
+				</Border>
+
+				<!-- Filters -->
+				<Border Grid.Row="1" Classes="ContentCard">
+					<Grid RowDefinitions="Auto,*">
+						<TextBlock Grid.Row="0" Text="Filter Options" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="Black"/>
+
+						<StackPanel Grid.Row="1">
+							<TextBlock Text="Status" FontWeight="SemiBold" Foreground="Black" Margin="0,0,0,5"/>
+							<ComboBox ItemsSource="{Binding StatusList}"
+                                      SelectedItem="{Binding SelectedStatusFilter}"
+                                      PlaceholderText="All Statuses"
+                                      HorizontalAlignment="Stretch"
+                                      Margin="0,0,0,15"/>
+
+							<TextBlock Text="Hospital" FontWeight="SemiBold" Foreground="Black" Margin="0,10,0,5"/>
+							<ComboBox ItemsSource="{Binding HospitalList}"
+                                      SelectedItem="{Binding SelectedHospital}"
+                                      PlaceholderText="All Hospitals"
+                                      HorizontalAlignment="Stretch"
+                                      Margin="0,0,0,15"/>
+
+							<TextBlock Text="Surgeon" FontWeight="SemiBold" Foreground="Black" Margin="0,10,0,5"/>
+							<ComboBox ItemsSource="{Binding SurgeonList}"
+                                      SelectedItem="{Binding SelectedSurgeon}"
+                                      PlaceholderText="All Surgeons"
+                                      HorizontalAlignment="Stretch"
+                                      Margin="0,0,0,15"/>
+
+							<TextBlock Text="Date Range" FontWeight="SemiBold" Foreground="Black" Margin="0,10,0,5"/>
+							<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" Margin="0,0,0,5">
+								<TextBlock Grid.Row="0" Grid.Column="0" Text="From:" VerticalAlignment="Center" Foreground="#616161" Margin="0,0,10,0"/>
+								<DatePicker Grid.Row="0" Grid.Column="1" SelectedDate="{Binding StartDateFilter}" HorizontalAlignment="Stretch"/>
+
+								<TextBlock Grid.Row="1" Grid.Column="0" Text="To:" VerticalAlignment="Center" Foreground="#616161" Margin="0,10,10,0"/>
+								<DatePicker Grid.Row="1" Grid.Column="1" SelectedDate="{Binding EndDateFilter}" HorizontalAlignment="Stretch" Margin="0,10,0,0"/>
+							</Grid>
+
+							<Button Content="Apply Filters"
+                                    Command="{Binding ApplyFiltersCommand}"
+                                    Classes="BlueButton"
+                                    Margin="0,15,0,0"
+                                    HorizontalAlignment="Stretch"/>
+
+							<Button Content="Reset Filters"
+                                    Command="{Binding ResetFiltersCommand}"
+                                    Classes="ActionButton"
+                                    HorizontalAlignment="Stretch"
+                                    Margin="0,10,0,0"/>
+
+							<Button Content="Print Report"
+                                    Command="{Binding PrintReportCommand}"
+                                    Classes="ActionButton"
+                                    HorizontalAlignment="Stretch"
+                                    Margin="0,20,0,0"/>
+						</StackPanel>
+					</Grid>
+				</Border>
+			</Grid>
+
+			<!-- Right Panel - Transplantation List and Details -->
+			<Border Grid.Column="1" Classes="ContentCard" Padding="0">
+				<Grid RowDefinitions="Auto,*,Auto">
+					<!-- Search and Actions Header -->
+					<Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="20,15,20,15">
+						<TextBox Grid.Column="0"
+                                 Text="{Binding SearchQuery}"
+                                 Watermark="Search by donor, recipient, hospital, or surgeon..."
+                                 MaxWidth="400"
+                                 Foreground="Black"
+                                 HorizontalAlignment="Left"/>
+
+						<StackPanel Grid.Column="1" Orientation="Horizontal">
+							<ComboBox ItemsSource="{Binding SortOptions}"
+                                      SelectedItem="{Binding SelectedSortOption}"
+                                      Width="180"
+                                      Margin="0,0,10,0"/>
+							<Button Content="Export Data" Command="{Binding ExportDataCommand}" Classes="ActionButton"/>
+						</StackPanel>
+					</Grid>
+
+					<!-- Transplantation List -->
+					<Border Grid.Row="1" BorderBrush="#FFE0E0E0" BorderThickness="0,1,0,0">
+						<Grid>
+							<!-- No Results Message -->
+							<TextBlock Text="No transplantations found matching your criteria"
+                                       IsVisible="{Binding NoTransplantationsFound}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Foreground="#9E9E9E"
+                                       FontSize="16"/>
+
+							<!-- List Content -->
+							<Grid RowDefinitions="*,Auto" IsVisible="{Binding !NoTransplantationsFound}">
+								<!-- Transplantations List -->
+								<ScrollViewer Grid.Row="0">
+									<ItemsControl ItemsSource="{Binding Transplantations}">
+										<ItemsControl.ItemTemplate>
+											<DataTemplate>
+												<Border Margin="15"
+                                                        Classes="TransplantationCard"
+                                                        Background="{Binding Status, Converter={StaticResource StatusToColorConverter}}">
+													<Grid ColumnDefinitions="Auto,*,Auto">
+														<!-- Status indicator -->
+														<Border Grid.Column="0"
+                                                                Width="50" Height="50"
+                                                                CornerRadius="25"
+                                                                Background="#E3F2FD"
+                                                                Margin="0,0,15,0">
+															<TextBlock Text="♥"
+                                                                       FontSize="24"
+                                                                       HorizontalAlignment="Center"
+                                                                       VerticalAlignment="Center"
+                                                                       Foreground="#1976D2"/>
+														</Border>
+
+														<!-- Transplantation Info -->
+														<StackPanel Grid.Column="1">
+															<Grid ColumnDefinitions="Auto,*" Margin="0,0,0,5">
+																<TextBlock Grid.Column="0" Text="ID: " Foreground="#757575"/>
+																<TextBlock Grid.Column="1" Text="{Binding Id}" Foreground="#424242"/>
+															</Grid>
+
+															<Grid ColumnDefinitions="Auto,*" Margin="0,0,0,5">
+																<TextBlock Grid.Column="0" Text="Donor: " Foreground="#757575"/>
+																<TextBlock Grid.Column="1" Text="{Binding Donor.FullName}" Foreground="#424242" FontWeight="SemiBold"/>
+															</Grid>
+
+															<Grid ColumnDefinitions="Auto,*" Margin="0,0,0,5">
+																<TextBlock Grid.Column="0" Text="Recipient: " Foreground="#757575"/>
+																<TextBlock Grid.Column="1" Text="{Binding Recipient.FullName}" Foreground="#424242" FontWeight="SemiBold"/>
+															</Grid>
+
+															<Grid ColumnDefinitions="Auto,*" Margin="0,0,0,5">
+																<TextBlock Grid.Column="0" Text="Organ: " Foreground="#757575"/>
+																<TextBlock Grid.Column="1" Text="{Binding Organ.Type}" Foreground="#424242"/>
+															</Grid>
+
+															<Grid ColumnDefinitions="Auto,*" Margin="0,0,0,5">
+																<TextBlock Grid.Column="0" Text="Hospital: " Foreground="#757575"/>
+																<TextBlock Grid.Column="1" Text="{Binding Hospital}" Foreground="#424242"/>
+															</Grid>
+
+															<Grid ColumnDefinitions="Auto,*" Margin="0,0,0,5">
+																<TextBlock Grid.Column="0" Text="Surgeon: " Foreground="#757575"/>
+																<TextBlock Grid.Column="1" Text="{Binding SurgeonName}" Foreground="#424242"/>
+															</Grid>
+
+															<Grid ColumnDefinitions="Auto,*,Auto,*" Margin="0,0,0,5">
+																<TextBlock Grid.Column="0" Text="Scheduled: " Foreground="#757575"/>
+																<TextBlock Grid.Column="1" Text="{Binding ScheduledDate, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Foreground="#424242" Margin="0,0,15,0"/>
+
+																<TextBlock Grid.Column="2" Text="Status: " Foreground="#757575"/>
+																<TextBlock Grid.Column="3" Text="{Binding Status}" Foreground="#424242" FontWeight="SemiBold"/>
+															</Grid>
+
+															<!-- Display duration if available -->
+															<Grid ColumnDefinitions="Auto,*" IsVisible="{Binding ActualStartDate, Converter={StaticResource NullToBooleanConverter}}">
+																<TextBlock Grid.Column="0" Text="Duration: " Foreground="#757575"/>
+																<TextBlock Grid.Column="1" Text="{Binding SurgeryDuration}" Foreground="#424242"/>
+															</Grid>
+														</StackPanel>
+
+														<!-- Actions -->
+														<StackPanel Grid.Column="2" Orientation="Vertical">
+															<Button Content="View Details"
+                                                                    Command="{Binding DataContext.ViewTransplantationDetailsCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                    CommandParameter="{Binding}"
+                                                                    Classes="ActionButton"
+                                                                    Margin="0,0,0,8"/>
+
+															<Button Content="Update Status"
+                                                                    Command="{Binding DataContext.UpdateTransplantationStatusCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                    CommandParameter="{Binding}"
+                                                                    Classes="ActionButton"
+                                                                    Margin="0,0,0,8"/>
+
+															<Button Content="Record Outcome"
+                                                                    Command="{Binding DataContext.RecordOutcomeCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                    CommandParameter="{Binding}"
+                                                                    Classes="ActionButton"/>
+														</StackPanel>
+													</Grid>
+												</Border>
+											</DataTemplate>
+										</ItemsControl.ItemTemplate>
+									</ItemsControl>
+								</ScrollViewer>
+
+								<!-- Outcome Details Panel (shown when a transplantation is selected) -->
+								<Border Grid.Row="1"
+                                        IsVisible="{Binding SelectedTransplantation, Converter={StaticResource NotNullToBooleanConverter}}"
+                                        BorderBrush="#E0E0E0"
+                                        BorderThickness="0,1,0,0"
+                                        Padding="15">
+									<Grid RowDefinitions="Auto,*">
+										<TextBlock Grid.Row="0"
+                                                   Text="Transplantation Outcomes"
+                                                   FontSize="16"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#1565C0"
+                                                   Margin="0,0,0,10"/>
+
+										<ItemsControl Grid.Row="1"
+                                                     ItemsSource="{Binding SelectedTransplantationOutcomes}"
+                                                     Margin="0,0,0,0">
+											<ItemsControl.ItemTemplate>
+												<DataTemplate>
+													<Border Margin="0,5"
+                                                            Padding="10"
+                                                            BorderBrush="#E0E0E0"
+                                                            BorderThickness="1"
+                                                            CornerRadius="4"
+                                                            Background="{Binding IsPositive, Converter={StaticResource BoolToColorConverter}}">
+														<Grid ColumnDefinitions="*,Auto">
+															<StackPanel Grid.Column="0">
+																<Grid ColumnDefinitions="Auto,*" Margin="0,0,0,5">
+																	<TextBlock Grid.Column="0" Text="Type: " Foreground="#757575"/>
+																	<TextBlock Grid.Column="1" Text="{Binding Type}" Foreground="#424242" FontWeight="SemiBold"/>
+																</Grid>
+
+																<Grid ColumnDefinitions="Auto,*" Margin="0,0,0,5">
+																	<TextBlock Grid.Column="0" Text="Date: " Foreground="#757575"/>
+																	<TextBlock Grid.Column="1" Text="{Binding AssessmentDate, StringFormat='{}{0:yyyy-MM-dd}'}" Foreground="#424242"/>
+																</Grid>
+
+																<Grid ColumnDefinitions="Auto,*" Margin="0,0,0,5">
+																	<TextBlock Grid.Column="0" Text="Result: " Foreground="#757575"/>
+																	<TextBlock Grid.Column="1"
+                                                                               Text="{Binding IsPositive, Converter={StaticResource BoolToResultConverter}}"
+                                                                               Foreground="{Binding IsPositive, Converter={StaticResource BoolToTextColorConverter}}"
+                                                                               FontWeight="SemiBold"/>
+																</Grid>
+
+																<Grid ColumnDefinitions="Auto,*" IsVisible="{Binding Notes, Converter={StaticResource StringNotEmptyToBooleanConverter}}">
+																	<TextBlock Grid.Column="0" Text="Notes: " Foreground="#757575"/>
+																	<TextBlock Grid.Column="1" Text="{Binding Notes}" Foreground="#424242" TextWrapping="Wrap"/>
+																</Grid>
+															</StackPanel>
+
+															<TextBlock Grid.Column="1"
+                                                                       Text="{Binding AssessedBy}"
+                                                                       Foreground="#757575"
+                                                                       VerticalAlignment="Bottom"
+                                                                       HorizontalAlignment="Right"
+                                                                       FontStyle="Italic"
+                                                                       FontSize="12"/>
+														</Grid>
+													</Border>
+												</DataTemplate>
+											</ItemsControl.ItemTemplate>
+
+											<!-- Empty state message -->
+											<ItemsControl.Template>
+												<ControlTemplate>
+													<Grid>
+														<ItemsPresenter IsVisible="{Binding !!Items.Count, RelativeSource={RelativeSource TemplatedParent}}"/>
+														<TextBlock Text="No outcomes recorded for this transplantation"
+                                                                   Foreground="#9E9E9E"
+                                                                   HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center"
+                                                                   Margin="0,20,0,0"
+                                                                   IsVisible="{Binding !Items.Count, RelativeSource={RelativeSource TemplatedParent}}"/>
+													</Grid>
+												</ControlTemplate>
+											</ItemsControl.Template>
+										</ItemsControl>
+									</Grid>
+								</Border>
+							</Grid>
+						</Grid>
+					</Border>
+				</Grid>
+			</Border>
+		</Grid>
+
+		<!-- Footer / Pagination -->
+		<Grid Grid.Row="2" Margin="0,15,0,0" ColumnDefinitions="Auto,*,Auto">
+			<TextBlock Grid.Column="0"
+                       Text="{Binding PaginationInfo}"
+                       VerticalAlignment="Center"
+                       Foreground="#FF616161"/>
+
+			<StackPanel Grid.Column="2" Orientation="Horizontal">
+				<Button Content="Previous"
+                        Command="{Binding PreviousPageCommand}"
+                        IsEnabled="{Binding CanGoToPreviousPage}"
+                        Classes="ActionButton"
+                        Margin="0,0,5,0"/>
+
+				<Button Content="Next"
+                        Command="{Binding NextPageCommand}"
+                        IsEnabled="{Binding CanGoToNextPage}"
+                        Classes="ActionButton"/>
+			</StackPanel>
+		</Grid>
+	</Grid>
+
+	<UserControl.Resources>
+		<converters:StatusToColorConverter x:Key="StatusToColorConverter"/>
+		<converters:BoolToColorConverter x:Key="BoolToColorConverter"/>
+		<converters:BoolToTextColorConverter x:Key="BoolToTextColorConverter"/>
+		<converters:BoolToResultConverter x:Key="BoolToResultConverter"/>
+		<converters:NullToBooleanConverter x:Key="NullToBooleanConverter"/>
+		<converters:NotNullToBooleanConverter x:Key="NotNullToBooleanConverter"/>
+		<converters:StringNotEmptyToBooleanConverter x:Key="StringNotEmptyToBooleanConverter"/>
+	</UserControl.Resources>
+
+	<!-- Styles -->
+	<UserControl.Styles>
+		<Style Selector="Border.ContentCard">
+			<Setter Property="Background" Value="White"/>
+			<Setter Property="CornerRadius" Value="10"/>
+			<Setter Property="Padding" Value="15"/>
+			<Setter Property="BoxShadow" Value="0 2 10 0 #15000000"/>
+		</Style>
+
+		<Style Selector="Border.TransplantationCard">
+			<Setter Property="Background" Value="White"/>
+			<Setter Property="CornerRadius" Value="8"/>
+			<Setter Property="Padding" Value="15"/>
+			<Setter Property="BoxShadow" Value="0 1 5 0 #10000000"/>
+		</Style>
+
+		<!-- Button styles from dashboard -->
+		<Style Selector="Button.BlueButton">
+			<Setter Property="Background" Value="#2196F3"/>
+			<Setter Property="Foreground" Value="White"/>
+			<Setter Property="CornerRadius" Value="4"/>
+			<Setter Property="Padding" Value="15,8"/>
+		</Style>
+
+		<!-- Hover state -->
+		<Style Selector="Button.BlueButton:pointerover">
+			<Setter Property="Background" Value="#1E88E5"/>
+		</Style>
+
+		<!-- Pressed state -->
+		<Style Selector="Button.BlueButton:pressed">
+			<Setter Property="Background" Value="#1565C0"/>
+		</Style>
+
+		<!-- Action Button Styles (simplified) -->
+		<Style Selector="Button.ActionButton">
+			<Setter Property="Background" Value="White"/>
+			<Setter Property="BorderBrush" Value="#DDDDDD"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="CornerRadius" Value="4"/>
+			<Setter Property="Padding" Value="12,8"/>
+			<Setter Property="Foreground" Value="#616161"/>
+		</Style>
+
+		<!-- Hover state for action buttons -->
+		<Style Selector="Button.ActionButton:pointerover">
+			<Setter Property="Background" Value="#F5F5F5"/>
+			<Setter Property="BorderBrush" Value="#CCCCCC"/>
+		</Style>
+
+		<!-- Pressed state for action buttons -->
+		<Style Selector="Button.ActionButton:pressed">
+			<Setter Property="Background" Value="#E0E0E0"/>
+			<Setter Property="BorderBrush" Value="#BBBBBB"/>
+		</Style>
+	</UserControl.Styles>
+</UserControl>
