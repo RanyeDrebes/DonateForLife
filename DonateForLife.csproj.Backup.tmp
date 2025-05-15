@@ -11,7 +11,6 @@
 	<ItemGroup>
 		<Folder Include="Assets\" />
 		<AvaloniaResource Include="Assets\**" />
-		<Folder Include="Styles\" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -25,5 +24,28 @@
 			<PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="Avalonia.ReactiveUI" Version="11.2.1" />
+
+		<!-- Database and Configuration Packages -->
+		<PackageReference Include="Npgsql" Version="7.0.7" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Views\DonorsView.axaml.cs">
+			<DependentUpon>DonorsView.axaml</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="appsettings.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="appsettings.Development.json" Condition="Exists('appsettings.Development.json')">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 </Project>
