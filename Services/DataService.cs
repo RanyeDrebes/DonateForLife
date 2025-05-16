@@ -1,11 +1,9 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DonateForLife.Models;
 using DonateForLife.Services.Database;
-using Microsoft.Extensions.Configuration;
 
 namespace DonateForLife.Services
 {
@@ -14,9 +12,6 @@ namespace DonateForLife.Services
     /// </summary>
     public class DataService
     {
-        // Singleton instance
-        private static DataService _instance;
-
         // Repositories for database access
         private readonly DonorRepository _donorRepository;
         private readonly RecipientRepository _recipientRepository;
@@ -34,37 +29,26 @@ namespace DonateForLife.Services
         private List<Transplantation> _transplantations;
         private List<ActivityLog> _activityLogs;
 
-        // Connection string
-        private readonly string _connectionString;
-
-        public static DataService Instance => _instance ??= new DataService();
-
-        private DataService()
+        // Constructor that accepts dependencies
+        public DataService(
+            DonorRepository donorRepository,
+            RecipientRepository recipientRepository,
+            OrganRepository organRepository,
+            MatchRepository matchRepository,
+            TransplantationRepository transplantationRepository,
+            ActivityLogRepository activityLogRepository,
+            ConfigurationRepository configurationRepository)
         {
-            // Read connection string from configuration
-            _connectionString = GetConnectionString();
-
-            // Initialize database connection helper
-            var dbHelper = new PostgresConnectionHelper(_connectionString);
-
-            // Initialize repositories
-            _donorRepository = new DonorRepository(dbHelper);
-            _recipientRepository = new RecipientRepository(dbHelper);
-            _organRepository = new OrganRepository(dbHelper);
-            _matchRepository = new MatchRepository(dbHelper);
-            _transplantationRepository = new TransplantationRepository(dbHelper);
-            _activityLogRepository = new ActivityLogRepository(dbHelper);
-            _configurationRepository = new ConfigurationRepository(dbHelper);
+            _donorRepository = donorRepository ?? throw new ArgumentNullException(nameof(donorRepository));
+            _recipientRepository = recipientRepository ?? throw new ArgumentNullException(nameof(recipientRepository));
+            _organRepository = organRepository ?? throw new ArgumentNullException(nameof(organRepository));
+            _matchRepository = matchRepository ?? throw new ArgumentNullException(nameof(matchRepository));
+            _transplantationRepository = transplantationRepository ?? throw new ArgumentNullException(nameof(transplantationRepository));
+            _activityLogRepository = activityLogRepository ?? throw new ArgumentNullException(nameof(activityLogRepository));
+            _configurationRepository = configurationRepository ?? throw new ArgumentNullException(nameof(configurationRepository));
 
             // Initialize cache
             LoadData();
-        }
-
-        private static string GetConnectionString()
-        {
-            // In a real application, this would come from app configuration
-            // For now, we'll return a default PostgreSQL connection string
-            return "Host=localhost;Port=5432;Database=donateforlife;Username=postgres;Password=postgres";
         }
 
         private async void LoadData()
@@ -96,6 +80,9 @@ namespace DonateForLife.Services
                 _activityLogs = [];
             }
         }
+
+        // Rest of the class remains the same...
+        // Keep all other methods as they are
 
         private void EstablishRelationships()
         {

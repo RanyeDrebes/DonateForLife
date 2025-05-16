@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using DonateForLife.Services;
@@ -68,8 +69,8 @@ public partial class App : Application
             // Refresh data from the database
             dataService.RefreshDataAsync().Wait();
 
-            // Create the main window view model using the service provider
-            var mainWindowViewModel = new MainWindowViewModel();
+            // Create the main window view model with the dataService
+            var mainWindowViewModel = new MainWindowViewModel(dataService);
 
             // Create and show the main window
             var mainWindow = new MainWindow { DataContext = mainWindowViewModel };
@@ -86,8 +87,18 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            // In a real app, you would log this error
-            Console.WriteLine($"Error showing main window: {ex.Message}");
+            // Improved error handling - show the actual exception details
+            Console.WriteLine($"Error showing main window: {ex}");
+
+            // Display an error message box
+            var messageBox = new Window
+            {
+                Title = "Error",
+                Content = new TextBlock { Text = $"Application error: {ex.Message}\n\n{ex.StackTrace}" },
+                Width = 600,
+                Height = 400
+            };
+            messageBox.Show();
             throw;
         }
     }

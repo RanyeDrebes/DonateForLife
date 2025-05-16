@@ -20,10 +20,10 @@ namespace DonateForLife.ViewModels
         private int _pendingMatches;
         private ObservableCollection<ActivityLog> _recentActivity = new ObservableCollection<ActivityLog>();
 
-        public DashboardViewModel()
+        public DashboardViewModel(DataService dataService)
         {
-            // Get data service from the service provider
-            _dataService = ViewModelLocator.GetService<DataService>();
+            // Get data service from constructor injection
+            _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
 
             // Get stats from data service
             UpdateStats();

@@ -40,27 +40,25 @@ namespace DonateForLife.ViewModels
         private bool _filterStatusInProcess;
         private bool _filterStatusCompleted;
 
-        public DonorsViewModel()
+        public DonorsViewModel(DataService dataService)
         {
-            _dataService = DataService.Instance;
+            _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
 
             // Initialize collections
-            Donors = new ObservableCollection<Donor>(_dataService.GetAllDonors());
-            CountryList = new ObservableCollection<string>(
-                _dataService.GetAllDonors()
+            Donors = [.. _dataService.GetAllDonors()];
+            CountryList = [.. _dataService.GetAllDonors()
                     .Select(d => d.Country)
                     .Distinct()
-                    .OrderBy(c => c)
-            );
-            SortOptions = new ObservableCollection<string>
-            {
+                    .OrderBy(c => c)];
+            SortOptions =
+            [
                 "Name (A-Z)",
                 "Name (Z-A)",
                 "Blood Type",
                 "Status",
                 "Date Registered (Newest)",
                 "Date Registered (Oldest)"
-            };
+            ];
             SelectedSortOption = SortOptions[0];
 
             // Update stats

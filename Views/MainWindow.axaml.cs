@@ -35,9 +35,15 @@ public partial class MainWindow : Window
             // When login succeeds, close this window and show a new main window
             loginViewModel.LoginSuccessful += (s, args) =>
             {
+                // Get the DataService from the service provider
+                var dataService = Program.ServiceProvider.GetRequiredService<Services.DataService>();
+
+                // Create the MainWindowViewModel with the DataService
+                var mainWindowViewModel = new MainWindowViewModel(dataService);
+
                 var mainWindow = new MainWindow
                 {
-                    DataContext = new MainWindowViewModel()
+                    DataContext = mainWindowViewModel
                 };
 
                 desktop.MainWindow = mainWindow;

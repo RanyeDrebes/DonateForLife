@@ -42,9 +42,9 @@ namespace DonateForLife.ViewModels
         private int _minUrgencyScore = 0;
         private int _maxUrgencyScore = 10;
 
-        public RecipientsViewModel()
+        public RecipientsViewModel(DataService dataService)
         {
-            _dataService = DataService.Instance;
+            _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
 
             // Initialize collections
             Recipients = new ObservableCollection<Recipient>(_dataService.GetAllRecipients());

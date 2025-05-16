@@ -20,14 +20,17 @@ namespace DonateForLife.ViewModels
         private bool _isSettingsSelected = false;
         private string _currentUserName;
         private string _currentUserRole;
+        private readonly DataService _dataService;
 
         // Get the AuthService instance
         private readonly AuthenticationService _authService;
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(DataService dataService)
         {
+            _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
+
             // Initialize with Dashboard
-            CurrentPage = new DashboardViewModel();
+            CurrentPage = new DashboardViewModel(_dataService);
 
             // Get services from the DI container
             _authService = Program.ServiceProvider.GetRequiredService<AuthenticationService>();
@@ -122,6 +125,28 @@ namespace DonateForLife.ViewModels
         // Event for logout
         public event EventHandler LogoutRequested;
 
+        private ViewModelBase CreateViewModel(string viewModelName)
+        {
+            switch (viewModelName)
+            {
+                case "Dashboard":
+                    return new DashboardViewModel(_dataService);
+                case "Donors":
+                    return new DonorsViewModel(_dataService);
+                case "Recipients":
+                    return new RecipientsViewModel(_dataService);
+                case "Matching":
+                    return new MatchingViewModel(_dataService);
+                case "Transplantations":
+                    return new TransplantationsViewModel(_dataService);
+                case "Settings":
+                    return new SettingsViewModel();
+                default:
+                    return new DashboardViewModel(_dataService);
+            }
+        }
+
+        // Then update NavigateToPage method
         private void NavigateToPage(string pageName)
         {
             // Reset all selections
@@ -132,37 +157,45 @@ namespace DonateForLife.ViewModels
             IsTransplantationsSelected = false;
             IsSettingsSelected = false;
 
-            // Set the selected page
-            switch (pageName)
+            try
             {
-                case "Dashboard":
-                    CurrentPage = new DashboardViewModel();
-                    IsDashboardSelected = true;
-                    break;
-                case "Donors":
-                    CurrentPage = new DonorsViewModel();
-                    IsDonorsSelected = true;
-                    break;
-                case "Recipients":
-                    CurrentPage = new RecipientsViewModel();
-                    IsRecipientsSelected = true;
-                    break;
-                case "Matching":
-                    CurrentPage = new MatchingViewModel();
-                    IsMatchingSelected = true;
-                    break;
-                case "Transplantations":
-                    CurrentPage = new TransplantationsViewModel();
-                    IsTransplantationsSelected = true;
-                    break;
-                case "Settings":
-                    CurrentPage = new SettingsViewModel();
-                    IsSettingsSelected = true;
-                    break;
-                default:
-                    CurrentPage = new DashboardViewModel();
-                    IsDashboardSelected = true;
-                    break;
+                // Set the selected page
+                CurrentPage = CreateViewModel(pageName);
+
+                // Set the appropriate selection flag
+                switch (pageName)
+                {
+                    case "Dashboard":
+                        IsDashboardSelected = true;
+                        break;
+                    case "Donors":
+                        IsDonorsSelected = true;
+                        break;
+                    case "Recipients":
+                        IsRecipientsSelected = true;
+                        break;
+                    case "Matching":
+                        IsMatchingSelected = true;
+                        break;
+                    case "Transplantations":
+                        IsTransplantationsSelected = true;
+                        break;
+                    case "Settings":
+                        IsSettingsSelected = true;
+                        break;
+                    default:
+                        IsDashboardSelected = true;
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                Console.WriteLine($"Error creating ViewModel for {pageName}: {ex}");
+
+                // Default to Dashboard as a fallback
+                CurrentPage = new DashboardViewModel(_dataService);
+                IsDashboardSelected = true;
             }
         }
 

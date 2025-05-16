@@ -36,9 +36,9 @@ namespace DonateForLife.ViewModels
         private DateTime? _endDateFilter;
         private ObservableCollection<TransplantationOutcome> _selectedTransplantationOutcomes;
 
-        public TransplantationsViewModel()
+        public TransplantationsViewModel(DataService dataService)
         {
-            _dataService = DataService.Instance;
+            _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
 
             // Initialize collections
             Transplantations = new ObservableCollection<Transplantation>(_dataService.GetAllTransplantations());

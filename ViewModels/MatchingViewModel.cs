@@ -28,9 +28,9 @@ namespace DonateForLife.ViewModels
         private double _waitingTimeWeight = 15;
         private double _urgencyWeight = 10;
 
-        public MatchingViewModel()
+        public MatchingViewModel(DataService dataService)
         {
-            _dataService = DataService.Instance;
+            _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
 
             // Initialize collections
             AvailableOrgans = [.. _dataService.GetAllOrgans().Where(o => o.Status == OrganStatus.Available)];
