@@ -62,7 +62,7 @@ namespace DonateForLife
 
             return services;
         }
-
+        
         // Initialize database
         public static async System.Threading.Tasks.Task InitializeDatabaseAsync(IServiceProvider serviceProvider)
         {
