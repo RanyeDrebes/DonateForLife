@@ -28,10 +28,7 @@ namespace DonateForLife.ViewModels
                         !string.IsNullOrWhiteSpace(username) &&
                         !string.IsNullOrWhiteSpace(password) &&
                         !isLoggingIn
-                ));
-
-            // Admin Auto-Login for testing (remove in production)
-            AdminLoginCommand = ReactiveCommand.CreateFromTask(AdminLoginAsync);
+             ));
         }
 
         public string Username
@@ -61,7 +58,6 @@ namespace DonateForLife.ViewModels
         public ICommand LoginCommand { get; }
 
         // Command for automatic admin login (testing only)
-        public ICommand AdminLoginCommand { get; }
 
         // Event raised when login is successful
         public event EventHandler<EventArgs>? LoginSuccessful;
@@ -83,37 +79,6 @@ namespace DonateForLife.ViewModels
                 else
                 {
                     ErrorMessage = "Invalid username or password.";
-                }
-            }
-            catch (Exception ex)
-            {
-                ErrorMessage = $"Login failed: {ex.Message}";
-            }
-            finally
-            {
-                IsLoggingIn = false;
-            }
-        }
-
-        // Admin auto-login for testing only
-        private async Task AdminLoginAsync()
-        {
-            try
-            {
-                ErrorMessage = string.Empty;
-                IsLoggingIn = true;
-
-                // Use the test login method to bypass normal authentication
-                bool success = await _authService.TestLoginAsync("admin");
-
-                if (success)
-                {
-                    // Raise event for login success
-                    LoginSuccessful?.Invoke(this, EventArgs.Empty);
-                }
-                else
-                {
-                    ErrorMessage = "Admin test login failed. Check that the 'admin' user exists in the database.";
                 }
             }
             catch (Exception ex)

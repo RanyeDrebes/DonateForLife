@@ -62,39 +62,6 @@
 						</Style>
 					</Button.Styles>
 				</Button>
-
-				<!-- Quick Admin Login (For testing only) -->
-				<Button Grid.Row="4"
-                        Content="Admin Login (For Testing)"
-                        Command="{Binding AdminLoginCommand}"
-                        IsEnabled="{Binding !IsLoggingIn}"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Center"
-                        Height="34"
-                        Margin="0,0,0,15">
-					<Button.Styles>
-						<Style Selector="Button">
-							<Setter Property="Background" Value="#FFEEEEEE"/>
-							<Setter Property="Foreground" Value="#FF757575"/>
-							<Setter Property="CornerRadius" Value="4"/>
-							<Setter Property="FontWeight" Value="Normal"/>
-							<Setter Property="FontSize" Value="12"/>
-						</Style>
-						<Style Selector="Button:pointerover">
-							<Setter Property="Background" Value="#FFE0E0E0"/>
-						</Style>
-						<Style Selector="Button:pressed">
-							<Setter Property="Background" Value="#FFBDBDBD"/>
-						</Style>
-					</Button.Styles>
-				</Button>
-
-				<TextBlock Grid.Row="5"
-                           Text="{Binding ErrorMessage}"
-                           IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                           Foreground="#FFD32F2F"
-                           TextWrapping="Wrap"
-                           HorizontalAlignment="Center"/>
 			</Grid>
 		</Border>
 

@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using DonateForLife.Services;
 using DonateForLife.ViewModels;
 using DonateForLife.Views;
@@ -45,61 +46,77 @@ public partial class App : Application
                 // When login is successful, show the main application
                 loginViewModel.LoginSuccessful += (sender, args) =>
                 {
-                    ShowMainWindow(desktop, serviceProvider);
+                    try
+                    {
+                        // Get the data service - log each step
+                        Console.WriteLine("Getting DataService...");
+                        var dataService = serviceProvider.GetRequiredService<DataService>();
+                        Console.WriteLine("DataService obtained successfully");
+
+                        // Create the main window view model
+                        Console.WriteLine("Creating MainWindowViewModel...");
+                        var mainWindowViewModel = new MainWindowViewModel(dataService);
+                        Console.WriteLine("MainWindowViewModel created successfully");
+
+                        // Create the main window
+                        Console.WriteLine("Creating MainWindow...");
+                        var mainWindow = new MainWindow { DataContext = mainWindowViewModel };
+                        Console.WriteLine("MainWindow created successfully");
+
+                        // Set the main window and show it
+                        Console.WriteLine("Setting MainWindow as desktop.MainWindow...");
+                        desktop.MainWindow = mainWindow;
+                        Console.WriteLine("About to show MainWindow...");
+                        mainWindow.Show();
+                        Console.WriteLine("MainWindow shown successfully");
+
+                        // Close login window
+                        Console.WriteLine("Closing login window...");
+                        loginWindow.Close();
+                        Console.WriteLine("Login complete and main window shown");
+                    }
+                    catch (Exception ex)
+                    {
+                        var msgBox = new Window
+                        {
+                            Title = "Application Error",
+                            WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                            Width = 500,
+                            Height = 300,
+                            Content = new TextBlock
+                            {
+                                Text = $"An error occurred starting the application:\n\n{ex.Message}\n\nSee error_log.txt for details.",
+                                TextWrapping = TextWrapping.Wrap,
+                                Margin = new Thickness(20)
+                            }
+                        };
+
+                        desktop.MainWindow = msgBox;
+                        msgBox.Show();
+                    }
                 };
             }
             catch (Exception ex)
             {
-                // In a real app, you would log this error
-                Console.WriteLine($"Initialization error: {ex}");
-                throw;
+                var errorWindow = new Window
+                {
+                    Title = "Startup Error",
+                    WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                    Width = 500,
+                    Height = 300,
+                    Content = new TextBlock
+                    {
+                        Text = $"Application failed to start:\n\n{ex.Message}",
+                        TextWrapping = TextWrapping.Wrap,
+                        Margin = new Thickness(20)
+                    }
+                };
+
+                desktop.MainWindow = errorWindow;
+                errorWindow.Show();
             }
         }
 
         base.OnFrameworkInitializationCompleted();
-    }
-
-    private void ShowMainWindow(IClassicDesktopStyleApplicationLifetime desktop, IServiceProvider serviceProvider)
-    {
-        try
-        {
-            // Get the data service
-            var dataService = serviceProvider.GetRequiredService<DataService>();
-
-            // Refresh data from the database
-            dataService.RefreshDataAsync().Wait();
-
-            // Create the main window view model with the dataService
-            var mainWindowViewModel = new MainWindowViewModel(dataService);
-
-            // Create and show the main window
-            var mainWindow = new MainWindow { DataContext = mainWindowViewModel };
-
-            // Store reference to the login window
-            var loginWindow = desktop.MainWindow as LoginWindow;
-
-            // Set the main window and show it
-            desktop.MainWindow = mainWindow;
-            mainWindow.Show();
-
-            // Close the login window
-            loginWindow?.Close();
-        }
-        catch (Exception ex)
-        {
-            // Improved error handling - show the actual exception details
-            Console.WriteLine($"Error showing main window: {ex}");
-
-            // Display an error message box
-            var messageBox = new Window
-            {
-                Title = "Error",
-                Content = new TextBlock { Text = $"Application error: {ex.Message}\n\n{ex.StackTrace}" },
-                Width = 600,
-                Height = 400
-            };
-            messageBox.Show();
-            throw;
-        }
     }
 }

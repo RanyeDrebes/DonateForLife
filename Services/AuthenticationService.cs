@@ -237,43 +237,6 @@ namespace DonateForLife.Services
                 Console.WriteLine($"Error hashing password: {ex.Message}");
                 throw;
             }
-        }
-
-        // Method for directly authenticating with known password hash (for testing)
-        public async Task<bool> TestLoginAsync(string username)
-        {
-            try
-            {
-                // Get the user
-                var user = await _userRepository.GetUserByUsernameAsync(username);
-
-                if (user == null || !user.IsActive)
-                {
-                    return false;
-                }
-
-                // Set user information directly
-                _currentUserId = user.Id;
-                _currentUsername = user.Username;
-                _currentUserRole = user.Role;
-
-                // Update last login
-                await _userRepository.UpdateUserLastLoginAsync(username);
-
-                // Log the login
-                await _activityLogRepository.AddActivityLogAsync(new Models.ActivityLog
-                {
-                    ActivityType = Models.ActivityType.SystemAlert,
-                    Description = $"User {username} logged in (test mode)",
-                    Timestamp = DateTime.Now
-                });
-
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
+        }   
     }
 }
