@@ -2,6 +2,8 @@
 using System;
 using System.Reactive;
 using System.Windows.Input;
+using DonateForLife.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DonateForLife.ViewModels
 {
@@ -16,16 +18,32 @@ namespace DonateForLife.ViewModels
         private bool _isMatchingSelected = false;
         private bool _isTransplantationsSelected = false;
         private bool _isSettingsSelected = false;
+        private string _currentUserName;
+        private string _currentUserRole;
+
+        // Get the AuthService instance
+        private readonly AuthenticationService _authService;
 
         public MainWindowViewModel()
         {
             // Initialize with Dashboard
             CurrentPage = new DashboardViewModel();
 
+            // Get services from the DI container
+            _authService = Program.ServiceProvider.GetRequiredService<AuthenticationService>();
+
+            // Get current user info
+            CurrentUserName = _authService.CurrentUsername ?? "Unknown User";
+            CurrentUserRole = _authService.CurrentUserRole ?? "Unknown Role";
+
+            // Update system status with login info
+            SystemStatus = $"Logged in as {CurrentUserName} ({CurrentUserRole}). System online.";
+
             // Commands
             NavigateToPageCommand = ReactiveCommand.Create<string>(NavigateToPage);
             ShowNotificationsCommand = ReactiveCommand.Create(ShowNotifications);
             ShowUserMenuCommand = ReactiveCommand.Create(ShowUserMenu);
+            LogoutCommand = ReactiveCommand.Create(Logout);
         }
 
         public object CurrentPage
@@ -44,6 +62,18 @@ namespace DonateForLife.ViewModels
         {
             get => _systemStatus;
             set => this.RaiseAndSetIfChanged(ref _systemStatus, value);
+        }
+
+        public string CurrentUserName
+        {
+            get => _currentUserName;
+            set => this.RaiseAndSetIfChanged(ref _currentUserName, value);
+        }
+
+        public string CurrentUserRole
+        {
+            get => _currentUserRole;
+            set => this.RaiseAndSetIfChanged(ref _currentUserRole, value);
         }
 
         // Navigation selection state
@@ -87,6 +117,10 @@ namespace DonateForLife.ViewModels
         public ReactiveCommand<string, Unit> NavigateToPageCommand { get; }
         public ReactiveCommand<Unit, Unit> ShowNotificationsCommand { get; }
         public ReactiveCommand<Unit, Unit> ShowUserMenuCommand { get; }
+        public ReactiveCommand<Unit, Unit> LogoutCommand { get; }
+
+        // Event for logout
+        public event EventHandler LogoutRequested;
 
         private void NavigateToPage(string pageName)
         {
@@ -142,6 +176,15 @@ namespace DonateForLife.ViewModels
         {
             // This would show a user menu flyout in a real app
             SystemStatus = "User menu accessed: " + DateTime.Now.ToString("HH:mm:ss");
+        }
+
+        private void Logout()
+        {
+            // Log the user out
+            _authService.Logout();
+
+            // Notify the app that logout was requested
+            LogoutRequested?.Invoke(this, EventArgs.Empty);
         }
     }
 }

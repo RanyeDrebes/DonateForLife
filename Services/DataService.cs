@@ -60,7 +60,7 @@ namespace DonateForLife.Services
             LoadData();
         }
 
-        private string GetConnectionString()
+        private static string GetConnectionString()
         {
             // In a real application, this would come from app configuration
             // For now, we'll return a default PostgreSQL connection string
@@ -88,12 +88,12 @@ namespace DonateForLife.Services
                 Console.WriteLine($"Error loading data: {ex.Message}");
 
                 // Initialize with empty lists to avoid null reference exceptions
-                _donors = new List<Donor>();
-                _recipients = new List<Recipient>();
-                _organs = new List<Organ>();
-                _matches = new List<Match>();
-                _transplantations = new List<Transplantation>();
-                _activityLogs = new List<ActivityLog>();
+                _donors = [];
+                _recipients = [];
+                _organs = [];
+                _matches = [];
+                _transplantations = [];
+                _activityLogs = [];
             }
         }
 

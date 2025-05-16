@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using DonateForLife.Services;
 using DonateForLife.Services.Database;
+using DonateForLife.ViewModels;
 
 namespace DonateForLife
 {
@@ -47,6 +48,16 @@ namespace DonateForLife
                 return new AuthenticationService(dbHelper, pepper);
             });
 
+            // Add ViewModels
+            services.AddTransient<LoginViewModel>();
+            services.AddTransient<MainWindowViewModel>();
+            services.AddTransient<DashboardViewModel>();
+            services.AddTransient<DonorsViewModel>();
+            services.AddTransient<RecipientsViewModel>();
+            services.AddTransient<MatchingViewModel>();
+            services.AddTransient<TransplantationsViewModel>();
+            services.AddTransient<SettingsViewModel>();
+
             // Add database initializer
             services.AddSingleton<DatabaseInitializer>(sp =>
             {
@@ -62,7 +73,7 @@ namespace DonateForLife
 
             return services;
         }
-        
+
         // Initialize database
         public static async System.Threading.Tasks.Task InitializeDatabaseAsync(IServiceProvider serviceProvider)
         {

@@ -1,8 +1,11 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using DonateForLife.Services;
 using DonateForLife.ViewModels;
 using DonateForLife.Views;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace DonateForLife;
 
@@ -17,12 +20,75 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow
+            try
             {
-                DataContext = new MainWindowViewModel(),
-            };
+                // Get the service provider
+                var serviceProvider = Program.ServiceProvider;
+                if (serviceProvider == null)
+                {
+                    throw new InvalidOperationException("Service provider is not initialized");
+                }
+
+                // Get the authentication service
+                var authService = serviceProvider.GetRequiredService<AuthenticationService>();
+
+                // Create login view model directly (not from DI to avoid circular dependency)
+                var loginViewModel = new LoginViewModel(authService);
+
+                // Create the login window
+                var loginWindow = new LoginWindow { DataContext = loginViewModel };
+
+                // Set the main window to the login window initially
+                desktop.MainWindow = loginWindow;
+
+                // When login is successful, show the main application
+                loginViewModel.LoginSuccessful += (sender, args) =>
+                {
+                    ShowMainWindow(desktop, serviceProvider);
+                };
+            }
+            catch (Exception ex)
+            {
+                // In a real app, you would log this error
+                Console.WriteLine($"Initialization error: {ex}");
+                throw;
+            }
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private void ShowMainWindow(IClassicDesktopStyleApplicationLifetime desktop, IServiceProvider serviceProvider)
+    {
+        try
+        {
+            // Get the data service
+            var dataService = serviceProvider.GetRequiredService<DataService>();
+
+            // Refresh data from the database
+            dataService.RefreshDataAsync().Wait();
+
+            // Create the main window view model using the service provider
+            var mainWindowViewModel = new MainWindowViewModel();
+
+            // Create and show the main window
+            var mainWindow = new MainWindow { DataContext = mainWindowViewModel };
+
+            // Store reference to the login window
+            var loginWindow = desktop.MainWindow as LoginWindow;
+
+            // Set the main window and show it
+            desktop.MainWindow = mainWindow;
+            mainWindow.Show();
+
+            // Close the login window
+            loginWindow?.Close();
+        }
+        catch (Exception ex)
+        {
+            // In a real app, you would log this error
+            Console.WriteLine($"Error showing main window: {ex.Message}");
+            throw;
+        }
     }
 }

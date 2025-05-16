@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using DonateForLife.Models;
-using DonateForLife.Services;
-using ReactiveUI;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Linq;
+using DonateForLife.Models;
+using DonateForLife.Services;
+using ReactiveUI;
 
 namespace DonateForLife.ViewModels
 {
     public class DashboardViewModel : ViewModelBase
     {
+        private readonly DataService _dataService;
+
         private int _totalDonors;
         private int _totalRecipients;
         private int _availableOrgans;
@@ -20,6 +22,9 @@ namespace DonateForLife.ViewModels
 
         public DashboardViewModel()
         {
+            // Get data service from the service provider
+            _dataService = ViewModelLocator.GetService<DataService>();
+
             // Get stats from data service
             UpdateStats();
 
@@ -68,23 +73,19 @@ namespace DonateForLife.ViewModels
 
         private void UpdateStats()
         {
-            var dataService = DataService.Instance;
-
-            TotalDonors = dataService.TotalDonors;
-            TotalRecipients = dataService.TotalRecipients;
-            AvailableOrgans = dataService.AvailableOrgans;
-            CompleteTransplantations = dataService.CompleteTransplantations;
-            PendingMatches = dataService.PendingMatches;
+            TotalDonors = _dataService.TotalDonors;
+            TotalRecipients = _dataService.TotalRecipients;
+            AvailableOrgans = _dataService.AvailableOrgans;
+            CompleteTransplantations = _dataService.CompleteTransplantations;
+            PendingMatches = _dataService.PendingMatches;
 
             // Update recent activity
-            var activity = dataService.GetRecentActivity();
+            var activity = _dataService.GetRecentActivity(10);
             RecentActivity.Clear();
             foreach (var log in activity)
             {
                 RecentActivity.Add(log);
             }
         }
-
-        // We'll implement simpler approach without converters for now
     }
 }
