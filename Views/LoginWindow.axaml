@@ -1,0 +1,108 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:DonateForLife.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
+        x:Class="DonateForLife.Views.LoginWindow"
+        x:DataType="vm:LoginViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="DonateForLife - Login"
+        Width="600" Height="450"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False"
+        Background="#FFF0F2F5">
+
+	<Design.DataContext>
+		<vm:LoginViewModel/>
+	</Design.DataContext>
+
+	<Grid RowDefinitions="Auto,*,Auto">
+		<!-- Header -->
+		<StackPanel Grid.Row="0" Margin="40,40,40,20">
+			<TextBlock Text="DonateForLife" FontSize="28" FontWeight="SemiBold" HorizontalAlignment="Center" Foreground="#FF1976D2"/>
+			<TextBlock Text="Organ Donation Management System" FontSize="18" HorizontalAlignment="Center" Foreground="#FF757575" Margin="0,5,0,0"/>
+		</StackPanel>
+
+		<!-- Login Form -->
+		<Border Grid.Row="1" Background="White" CornerRadius="10" Margin="80,0" BoxShadow="0 2 20 0 #20000000">
+			<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" Margin="40,30">
+				<TextBlock Grid.Row="0" Text="Login to your account" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,20" Foreground="#FF424242"/>
+
+				<StackPanel Grid.Row="1" Margin="0,0,0,15">
+					<TextBlock Text="Username" Margin="0,0,0,5" Foreground="#FF616161"/>
+					<TextBox Text="{Binding Username}" Watermark="Enter your username" Padding="10" />
+				</StackPanel>
+
+				<StackPanel Grid.Row="2" Margin="0,0,0,20">
+					<TextBlock Text="Password" Margin="0,0,0,5" Foreground="#FF616161"/>
+					<TextBox Text="{Binding Password}" PasswordChar="●" Watermark="Enter your password" Padding="10" />
+				</StackPanel>
+
+				<Button Grid.Row="3"
+                        Content="Login"
+                        Command="{Binding LoginCommand}"
+                        IsEnabled="{Binding !IsLoggingIn}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Height="44"
+                        Margin="0,0,0,15">
+					<Button.Styles>
+						<Style Selector="Button">
+							<Setter Property="Background" Value="#FF2196F3"/>
+							<Setter Property="Foreground" Value="White"/>
+							<Setter Property="CornerRadius" Value="4"/>
+							<Setter Property="FontWeight" Value="SemiBold"/>
+						</Style>
+						<Style Selector="Button:pointerover">
+							<Setter Property="Background" Value="#FF1E88E5"/>
+						</Style>
+						<Style Selector="Button:pressed">
+							<Setter Property="Background" Value="#FF1565C0"/>
+						</Style>
+					</Button.Styles>
+				</Button>
+
+				<!-- Quick Admin Login (For testing only) -->
+				<Button Grid.Row="4"
+                        Content="Admin Login (For Testing)"
+                        Command="{Binding AdminLoginCommand}"
+                        IsEnabled="{Binding !IsLoggingIn}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Height="34"
+                        Margin="0,0,0,15">
+					<Button.Styles>
+						<Style Selector="Button">
+							<Setter Property="Background" Value="#FFEEEEEE"/>
+							<Setter Property="Foreground" Value="#FF757575"/>
+							<Setter Property="CornerRadius" Value="4"/>
+							<Setter Property="FontWeight" Value="Normal"/>
+							<Setter Property="FontSize" Value="12"/>
+						</Style>
+						<Style Selector="Button:pointerover">
+							<Setter Property="Background" Value="#FFE0E0E0"/>
+						</Style>
+						<Style Selector="Button:pressed">
+							<Setter Property="Background" Value="#FFBDBDBD"/>
+						</Style>
+					</Button.Styles>
+				</Button>
+
+				<TextBlock Grid.Row="5"
+                           Text="{Binding ErrorMessage}"
+                           IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                           Foreground="#FFD32F2F"
+                           TextWrapping="Wrap"
+                           HorizontalAlignment="Center"/>
+			</Grid>
+		</Border>
+
+		<!-- Footer -->
+		<TextBlock Grid.Row="2"
+                   Text="© 2025 DonateForLife. All rights reserved."
+                   HorizontalAlignment="Center"
+                   Margin="0,20,0,20"
+                   Foreground="#FF757575" />
+	</Grid>
+</Window>
